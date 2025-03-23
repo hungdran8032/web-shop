@@ -96,4 +96,10 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsername(username);
     }
 
+    @Override
+    public User findUserByToken(String token) {
+        Long userId = jwtProvider.getUserIdFromToken(token, TypeToken.ACCESS);
+        return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    }
+
 }

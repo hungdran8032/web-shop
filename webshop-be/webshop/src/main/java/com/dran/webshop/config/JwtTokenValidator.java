@@ -10,11 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.dran.webshop.custom.CustomUserDetail;
 import com.dran.webshop.util.TypeToken;
 
 import java.io.IOException;
@@ -29,13 +27,13 @@ public class JwtTokenValidator extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String authorization = request.getHeader(JWT_CONSTANT.JWT_HEADER);
-        // UserDetailsService uds = null;
+
         if (authorization != null && authorization.startsWith("Bearer ")) {
             String token = authorization.substring(7);
             try {
                 if (SecurityContextHolder.getContext().getAuthentication() == null) {
                     String username = jwtProvider.verifyTokenAndUsername(token, TypeToken.ACCESS);
-                    // CustomUserDetail user = (CustomUserDetail) uds.loadUserByUsername(username);
+
                     SecurityContext context = SecurityContextHolder.createEmptyContext();
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null,
                             null);

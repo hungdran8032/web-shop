@@ -294,8 +294,9 @@ const Home = () => {
                         <Paper sx={{ p: 3, height: "100%", textAlign: "center" }}>
                             <Box
                                 component="img"
-                                src="https://via.placeholder.com/80?text=Icon"
+                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6yi0djlxZnT8c0nYgWrX_pimeI7rSixOCzA&s"
                                 alt="Fast Shipping"
+
                                 sx={{ width: 80, height: 80, mb: 2 }}
                             />
                             <Typography variant="h6" gutterBottom>

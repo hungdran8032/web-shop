@@ -12,6 +12,7 @@ import com.dran.webshop.custom.CustomUserDetail;
 import com.dran.webshop.model.User;
 import com.dran.webshop.util.TypeToken;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
 @Service
@@ -64,6 +65,18 @@ public class JwtProvider {
 
     private SecretKey getSecretKey(TypeToken typeToken) {
         return Keys.hmacShaKeyFor(typeToken == TypeToken.ACCESS ? ACCESS_KEY.getBytes() : REFRESH_KEY.getBytes());
+    }
+
+    public Long getUserIdFromToken(String token, TypeToken typeToken) {
+        token = token.substring(7);
+        Claims claims = Jwts.parser()
+                .verifyWith(getSecretKey(typeToken))
+                .requireIssuer(ISSUER)
+                .build()
+                .parseClaimsJws(token)
+                .getPayload();
+
+        return Long.parseLong(claims.get("userId").toString());
     }
 
 }
