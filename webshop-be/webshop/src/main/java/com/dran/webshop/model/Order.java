@@ -1,10 +1,7 @@
 package com.dran.webshop.model;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import com.dran.webshop.util.PaymentMethod;
-import com.dran.webshop.util.PaymentStatus;
 import com.dran.webshop.util.TypeStatus;
 
 import jakarta.persistence.CascadeType;
@@ -34,6 +31,7 @@ public class Order extends BaseEntity {
     private String shippingAddress;
     private String phoneNumber;
     private Double totalPrice;
+
     private TypeStatus typeOrderStatus;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
