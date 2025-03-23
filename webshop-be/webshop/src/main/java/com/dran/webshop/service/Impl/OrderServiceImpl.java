@@ -24,6 +24,7 @@ import com.dran.webshop.request.UpdateStatusRequest;
 import com.dran.webshop.response.OrderDetailResponse;
 import com.dran.webshop.response.OrderResponse;
 import com.dran.webshop.service.OrderService;
+import com.dran.webshop.util.TypeStatus;
 import com.dran.webshop.util.TypeToken;
 
 import lombok.RequiredArgsConstructor;
@@ -94,26 +95,46 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderResponse> getOrdersByUser(Long userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getOrdersByUser'");
+        // Long userId = jwtProvider.getUserIdFromToken(jwt, TypeToken.ACCESS);
+        List<Order> orders = orderRepository.findByUserId(userId);
+        if (orders == null) {
+            throw new RuntimeException("Bạn chưa đặt hàng nào");
+        }
+        return orders.stream().map(orderMapper::convertToResponse).toList();
     }
 
     @Override
     public OrderResponse getOrderById(Long orderId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getOrderById'");
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+        return orderMapper.convertToResponse(order);
     }
 
     @Override
-    public void updateOrderStatus(Long orderId, UpdateStatusRequest req) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateOrderStatus'");
+    public OrderResponse updateOrderStatus(Long orderId, UpdateStatusRequest req) {
+        Order res = findOrderById(orderId);
+        TypeStatus newStatus = TypeStatus.valueOf(req.getTypeOrderStatus().toUpperCase());
+        res.setTypeOrderStatus(newStatus);
+        Order updatedOrder = orderRepository.save(res);
+        return orderMapper.convertToResponse(updatedOrder);
     }
 
     @Override
     public List<OrderResponse> getOrders() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getOrders'");
+        return orderRepository.findAll().stream().map(orderMapper::convertToResponse).toList();
     }
 
+    private Order findOrderById(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+    }
+
+    @Override
+    public OrderResponse getOrderByIdForUser(Long orderId, Long userId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        if (!order.getUser().getId().equals(userId)) {
+            throw new SecurityException("Access denied: You can only view your own orders.");
+        }
+        return orderMapper.convertToResponse(order);
+    }
 }
