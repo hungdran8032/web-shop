@@ -13,6 +13,10 @@ import AdminProductManagement from "./pages/admin/AdminProductManagement"
 import AdminCategoryManagement from "./pages/admin/AdminCategoryManagement"
 import ProductsPage from "./pages/ProductPages"
 import NotFound from "./pages/NotFound"
+import UserOrders from "./pages/UserOrders"
+import OrderDetail from "./pages/OrderDetail"
+import AdminOrders from "./pages/admin/AdminOrders"
+import Checkout from "./pages/Checkout"
 
 // Create a theme instance
 const theme = createTheme({
@@ -87,10 +91,15 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
 
+          {/* User Orders */}
+          <Route path="/orders" element={<UserOrders />} />
+          <Route path="/order/:orderId" element={<OrderDetail />} />
           {/* Admin routes */}
           <Route path="/admin/products" element={<AdminProductManagement />} />
           <Route path="/admin/categories" element={<AdminCategoryManagement />} />
+          <Route path="/admin/orders" element={<AdminOrders />} />
 
           {/* 404 route */}
           <Route path="*" element={<NotFound />} />

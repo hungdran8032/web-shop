@@ -1,4 +1,6 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
+// import { navigate } from "react-router-dom";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -17,52 +19,6 @@ api.interceptors.request.use((config) => {
     }
     return config;
 });
-
-api.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-        const originalRequest = error.config;
-
-        // Kiểm tra lỗi 401 và đảm bảo không lặp lại request
-        if (error.response && error.response.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true; // Đánh dấu request đã thử lại
-
-            try {
-                // Lấy refreshToken từ localStorage
-                const refreshToken = localStorage.getItem("refreshToken");
-                if (!refreshToken) {
-                    throw new Error("No refresh token available");
-                }
-
-                // Gọi API refresh token
-                const response = await axios.post(`${API_URL}/api/v1/auth/refresh`, {
-                    refreshToken,
-                });
-
-                const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
-
-                // Lưu accessToken và refreshToken mới
-                localStorage.setItem("accessToken", newAccessToken);
-                localStorage.setItem("refreshToken", newRefreshToken);
-
-                // Cập nhật header của request ban đầu với accessToken mới
-                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-
-                // Thử lại request ban đầu
-                return api(originalRequest);
-            } catch (refreshError) {
-                // Nếu refresh token cũng hết hạn, đăng xuất
-                localStorage.removeItem("accessToken");
-                localStorage.removeItem("refreshToken");
-                alert("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.");
-                navigate("/login");
-                return Promise.reject(refreshError);
-            }
-        }
-
-        return Promise.reject(error);
-    }
-);
 
 export const register = async (userData) => {
     const response = await api.post("/api/v1/auth/register", userData);
@@ -173,4 +129,46 @@ export const getCartItemsByUser = async (userId) => {
 // API để xóa CartItem
 export const deleteCartItem = async (id) => {
     await api.delete(`/api/v1/cart-items/${id}`);
+};
+
+export const createOrder = async (orderData, jwt) => {
+    const formData = new FormData();
+    formData.append("order", JSON.stringify(orderData));
+    const response = await api.post("/api/v1/orders", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: jwt,
+        },
+    });
+    return response.data;
+};
+
+export const getOrdersByUser = async (userId) => {
+    const response = await api.get(`/api/v1/orders/user/${userId}`);
+    return response.data;
+};
+
+export const getOrders = async () => {
+    const response = await api.get("/api/v1/orders/admin");
+    return response.data;
+};
+
+export const getOrderByIdForUser = async (orderId, userId) => {
+    const response = await api.get(`/api/v1/orders/${orderId}`, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+    });
+    return response.data;
+};
+
+export const updateOrderStatus = async (orderId, statusData) => {
+    const formData = new FormData();
+    formData.append("status", JSON.stringify(statusData));
+    const response = await api.post(`/api/v1/orders/${orderId}`, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    return response.data;
 };

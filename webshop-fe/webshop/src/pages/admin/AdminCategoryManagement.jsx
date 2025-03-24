@@ -39,7 +39,8 @@ const AdminCategoryManagement = () => {
     useEffect(() => {
         const roles = JSON.parse(localStorage.getItem("roles") || "[]");
         if (!roles.includes("ADMIN")) {
-            navigate("/"); // Chuyển hướng nếu không phải admin
+            navigate("/");
+            return; // Chuyển hướng nếu không phải admin
         }
 
         const fetchCategories = async () => {

@@ -102,7 +102,7 @@ const Navbar = () => {
         const userId = localStorage.getItem("userId")
 
         setIsLoggedIn(!!token)
-        setIsAdmin(roles.includes("ROLE_ADMIN"))
+        setIsAdmin(roles.includes("ADMIN"))
 
         // Lấy số lượng sản phẩm trong giỏ hàng từ API
         const fetchCartCount = async () => {
